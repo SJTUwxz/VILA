@@ -177,6 +177,7 @@ def train():
 
     parser = HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    print(model_args, data_args, training_args)
     training_args.run_name = training_args.output_dir.split("/")[-1]
     local_rank = training_args.local_rank
     compute_dtype = (

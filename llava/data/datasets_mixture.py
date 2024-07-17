@@ -1,4 +1,8 @@
 from dataclasses import dataclass, field
+import os
+
+VL_DATA_DIR = "/mnt/mir/datasets/vlm-evaluation-datasets/" 
+
 
 
 @dataclass
@@ -222,6 +226,14 @@ def register_datasets_mixtures():
         image_path="./playground/data/sharegpt_video/videos",
     )
     add_dataset(sharegpt_video)
+
+    nextqa = Dataset(
+        dataset_name="nextqa",
+        dataset_type="torch",
+        data_path=os.path.join(VL_DATA_DIR, "nextqa", "annotations", "nextqa_train.json"),
+        image_path=os.path.join(VL_DATA_DIR, "nextqa", "videos")
+    )
+    add_dataset(nextqa)
 
 
 

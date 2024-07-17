@@ -53,6 +53,8 @@ from llava.model import *
 from llava.train.args import DataArguments, TrainingArguments
 from llava.train.llava_trainer import LLaVATrainer
 
+from decord import VideoReader
+
 # torch.backends.cudnn.enabled = False
 
 
@@ -744,7 +746,16 @@ class LazySupervisedDataset(Dataset):
         else:
             image_size = data_args.image_processor.size["height"]
         try:
-            pil_imgs = opencv_extract_frames(video_path, num_video_frames, fps, frame_count)
+            use_decord = True
+            if not use_decord:
+                pil_imgs = opencv_extract_frames(video_path, num_video_frames, fps, frame_count)
+            else:
+                vr = VideoReader(video_path)
+                frame_count = len(vr)
+                frame_indices = np.linspace(0, frame_count - 2, num_video_frames, dtype=int)
+                frames = vr.get_batch(frame_indices.tolist()).asnumpy()
+                pil_imgs = [Image.fromarray(frame) for frame in frames]
+
         except Exception as e:
             video_loading_succeed = False
             print(f"bad data path {video_path}")

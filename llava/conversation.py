@@ -147,8 +147,7 @@ class Conversation:
         images = []
         for i, (role, msg) in enumerate(self.messages[self.offset:]):
             if i % 2 == 0:
-                if type(msg) is tuple:
-                    import base64
+                if type(msg) is tuple: import base64
                     from io import BytesIO
                     from PIL import Image
                     msg, image, image_process_mode = msg

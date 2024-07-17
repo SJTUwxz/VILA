@@ -48,7 +48,7 @@ def get_model_output(model, image_processor, tokenizer, video_path, qs, options,
     images, video_loading_succeed = LazySupervisedDataset._load_video(video_path, num_video_frames, args)
     image_tensor = process_images(images, image_processor, model.config)
 
-    more_options = f"A: {options[0]}. B: {options[1]}. C: {options[2]}. D: {options[3]}. E: {options[4]}.\n Select the correct answer from the options (A,B,C,D,E).\n"
+    more_options = f"{options[0]} {options[1]} {options[2]} {options[3]}.\n Select the correct answer from the options (A,B,C,D).\n"
     qs = '<image>\n' * num_video_frames + qs +"?\n " + more_options
 
     conv = conv_templates[args.conv_mode].copy()
@@ -102,19 +102,25 @@ def eval_model(args):
     # Read the ground truth csv file
     gt_file = os.path.expanduser(args.gt_file)
     with open(gt_file, 'r') as f:
-        gt_qa_data = f.readlines()
+        gt_qa_data = json.load(f)
     # convert the csv data into a list of dictionaries
     gt_questions = []
     gt_answers = []
-    for line in gt_qa_data[1:]:
-        # video,frame_count,width,height,question,answer,qid,type
-        line = line.strip()
-        line = line.split(',')
-        # NOTE: change the index to index - 1
-        gt_questions.append({'video_name': line[0], 'question': line[4], 'question_id': line[6], 'options': line[8:13]})
-        answer_id = line[5]
-        answer = line[8+int(answer_id)]
-        gt_answers.append({'answer': answer})
+    for video in gt_qa_data:
+        video_name = video["video_id"]
+        for qs in video["questions"]:
+            gt_questions.append({'video_name': video_name, 'question': qs["question"], 'question_id': qs["question_id"], 'options': qs['choices']})
+            gt_answers.append({'answer': qs['answer']})
+
+    # for line in gt_qa_data[1:]:
+    #     # video,frame_count,width,height,question,answer,qid,type
+    #     line = line.strip()
+    #     line = line.split(',')
+    #     # NOTE: change the index to index - 1
+    #     gt_questions.append({'video_name': line[0], 'question': line[4], 'question_id': line[6], 'options': line[8:13]})
+    #     answer_id = line[5]
+    #     answer = line[8+int(answer_id)]
+    #     gt_answers.append({'answer': answer})
     gt_questions = get_chunk(gt_questions, args.num_chunks, args.chunk_idx)
     gt_answers = get_chunk(gt_answers, args.num_chunks, args.chunk_idx)
 

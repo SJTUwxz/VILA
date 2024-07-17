@@ -7,9 +7,9 @@ if [ "$#" -ge 3 ]; then
     CONV_MODE="$3"
 fi
 # GPT_Zero_Shot_QA="/lustre/fsw/portfolios/nvr/projects/nvr_elm_llm/dataset/video_datasets_v2/GPT_Zero_Shot_QA"
-NEXTQA="/mnt/mir/datasets/vlm-evaluation-datasets/nextqa/"
-video_dir="${NEXTQA}/videos"
-gt_file="${NEXTQA}/annotations/val.csv"
+VideoMME="/mnt/mir/datasets/vlm-evaluation-datasets/Video-MME/"
+video_dir="${VideoMME}/videos"
+gt_file="${VideoMME}/Video-MME.json"
 output_dir=$save_dir
 
 
@@ -20,7 +20,7 @@ CHUNKS=${#GPULIST[@]}
 
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
-  CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python3 llava/eval/model_vqa_nextqa.py \
+  CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python3 llava/eval/model_vqa_video_mme.py \
       --model-path ${model_path} \
       --video_dir ${video_dir} \
       --model_max_length 8192 \
